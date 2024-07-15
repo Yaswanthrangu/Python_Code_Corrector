@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Python Code Corrector</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Python Code Corrector</h1>
+        <form id="codeForm">
+            <label for="code">Input Code:</label>
+            <textarea id="code" name="code" rows="10" cols="50"></textarea>
+            <br>
+            <label for="error">Error Message:</label>
+            <textarea id="error" name="error" rows="2" cols="50"></textarea>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+        <h2>Suggestions:</h2>
+        <pre id="suggestions"></pre>
+    </div>
+    <script>
+        document.getElementById('codeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const code = document.getElementById('code').value;
+            const error = document.getElementById('error').value;
+
+            fetch('/correct_code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: code, error: error })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displaySuggestions(data.suggestions);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        function displaySuggestions(suggestions) {
+            const suggestionsPre = document.getElementById('suggestions');
+            suggestionsPre.innerHTML = suggestions.map(suggestion => `<code>${suggestion}</code>`).join('\n\n');
+        }
+    </script>
+</body>
+</html>
